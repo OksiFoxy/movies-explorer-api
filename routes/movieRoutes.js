@@ -5,7 +5,6 @@ const {
 } = require('../controllers/movie');
 const { validNewMovie, validMovieId } = require('../utils/validate');
 
-// возвращает все сохранённые текущим  пользователем фильмы
 movieRouter.get('/', getMovieSave);
 // создаёт фильм с переданными в теле
 // country, director, duration, year, description, image, trailer,

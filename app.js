@@ -6,11 +6,12 @@ const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 const allRouters = require('./routes/index');
 const errorHandler = require('./middlewares/errorHandler');
+const cors = require('./middlewares/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 const app = express();
-
+app.use(cors);
 // AntiDOS & helmet
 // https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
