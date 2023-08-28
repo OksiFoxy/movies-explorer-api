@@ -1,0 +1,9 @@
+.cardlist__container-type-saved {
+  padding-bottom: 150px;
+}
+
+@media screen and (max-width: 768px) {
+  .cardlist__container-type-saved {
+    padding-bottom:80px;
+  }
+}

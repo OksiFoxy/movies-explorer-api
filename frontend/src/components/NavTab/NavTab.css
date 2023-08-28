@@ -1,0 +1,41 @@
+.navtab {
+  width: 100%;
+  background-color: #000000;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navtab__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-self: center;
+  gap: 40px;
+  font-size: 13px;
+  line-height: 16px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.navtab__link {
+  color: #FFFFFF;
+}
+
+.navtab__link:hover {
+  opacity: .8;
+}
+
+@media screen and (max-width: 340px) {
+  .navtab__list {
+    font-size: 11px;
+    gap: 24px;
+  }
+
+  .navtab__link {
+    text-underline-offset: 2px;
+  }
+}
