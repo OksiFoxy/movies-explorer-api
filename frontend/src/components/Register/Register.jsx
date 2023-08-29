@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import "./Register.css";
 
-export default function Register({ onRegister }) {
+export default function Register({ onSubmit, loggedIn }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,9 +20,9 @@ export default function Register({ onRegister }) {
     setName(event.target.value);
   };
 
-  const handleSubmit = event => {
+  const handleRegister = event => {
     event.preventDefault();
-    onRegister(name, email, password);
+    onSubmit(name, email, password);
   };
 
   return (
@@ -32,7 +32,10 @@ export default function Register({ onRegister }) {
           <div className="register__logo"></div>
         </Link>
         <h3 className="register__title">Добро пожаловать!</h3>
-        <form className="register__form" name="register" onSubmit={handleSubmit}>
+        <form 
+        className="register__form" 
+        name="register" 
+        onSubmit={handleRegister}>
           <label className="register__input-label">
             Имя
           </label>

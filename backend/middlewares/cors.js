@@ -1,6 +1,6 @@
 const allowedCors = [
   'http://localhost:3000',
-  'https://oksifoxy.movie.nomore.nomoredomains.xyz',
+  'http://oksifoxy.movie.nomore.nomoredomains.xyz',
   'http://api.oksifoxy.movie.nomoredomains.xyz',
   'https://oksifoxy.movie.nomore.nomoredomains.xyz',
   'https://api.oksifoxy.movie.nomoredomains.xyz',

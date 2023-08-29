@@ -1,95 +1,74 @@
-class Api {
-  constructor({ baseUrl, headers }) {
-    this._headers = headers;
-    this._baseUrl = baseUrl;
-  }
+// import {BASE_URL} from './constants';
+const BASE_URL ='http://api.oksifoxy.movie.nomoredomains.xyz';
 
-  _checkResponse(res) {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(res.status);
-  }
-
-  getUserInfo = () => {
-    const requestUrl = this._baseUrl + '/users/me';
-    return fetch(requestUrl, {
-      headers: this._headers,
+export const editProfile = ({name, email}) => {
+  const requestUrl = BASE_URL + '/users/me';
+  return fetch(requestUrl, {
+    method: 'PATCH',
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+    },
+    body: JSON.stringify({name,email,}),
     })
-      .then(this._checkResponse);
-  }
+    .then((res) => checkResponse(res));
+};
 
-  getInitialMovies = () => {
-    const requestUrl = this._baseUrl + '/movies';
-    return fetch(requestUrl, {
-      headers: this._headers,
-    })
-      .then(this._checkResponse);
-  }
+export const saveMovies = (movie) => {
+  const requestUrl = BASE_URL + '/movies/';
+  return fetch(requestUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+    },
+    body: JSON.stringify({
+      country: movie.country,
+      director: movie.director,
+      duration: movie.duration,
+      year: movie.year,
+      description: movie.description,
+      image: `https://api.nomoreparties.co${movie.image.url}`,
+      trailer: movie.trailerLink,
+      nameRU: movie.nameRU,
+      nameEN: movie.nameEN,
+      thumbnail: `https://api.nomoreparties.co${movie.image.formats.thumbnail.url}`,
+      movieId: movie.id,
+    }),
+  }).then((res) => checkResponse(res));
+};
 
-  getDataFromServer = () => {
-    return Promise.all([this.getInitialMovies(), this.getUserInfo()]);
-  }
+export const getUserMovies = () => {
+  const requestUrl = BASE_URL + '/movies/';
+  return fetch(requestUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+    },
+  }).then((res) => checkResponse(res));
+};
 
-  setUserInfo = (email, name) => {
-    const requestUrl = this._baseUrl + '/users/me';
-    return fetch(requestUrl, {
-      method: "PATCH",
-      headers: this._headers,
-      body: JSON.stringify({
-        email: email,
-        name: name,
-      }),
-    })
-      .then(this._checkResponse);
-  }
+export const deleteSavedMovie = (movieId) => {
+  const requestUrl = BASE_URL + `/movies/${movieId}`;
+  return fetch(requestUrl, {
+    method: "DELETE",
+  }).then((res) => checkResponse(res));
+};
 
-  getSavedMovies = () => {
-    const requestUrl = this._baseUrl + '/movies';
-    return fetch(requestUrl, {
-      headers: this._headers,
-    })
-      .then(this._checkResponse);
-  }
+export const logoutUser = () => {
+  const requestUrl = BASE_URL + '/signout';
+  return fetch(requestUrl, {
+    method: "POST",
+    credentials: "include",
+  }).then((res) => checkResponse(res));
+};
 
-  saveMovies = (movie) => {
-    const requestUrl = this._baseUrl + `/movies/`;
-    return fetch(requestUrl, {
-      method: "POST",
-      headers: this._headers,
-      body: JSON.stringify({
-        country: movie.country,
-        director: movie.director,
-        duration: movie.duration,
-        year: movie.year,
-        description: movie.description,
-        image: movie.image,
-        trailerLink: movie.trailerLink,
-        nameRU: movie.nameRU,
-        nameEN: movie.nameEN,
-        thumbnail: movie.thumbnail,
-        movieId: String(movie.movieId),
-      })
-    })
-      .then(this._checkResponse);
+function checkResponse(res) {
+  if (res.ok) {
+    return res.json();
   }
-
-  deleteMovie = (movieId) => {
-    const requestUrl = this._baseUrl + `/movies/${movieId}`;
-    return fetch(requestUrl, {
-      method: 'DELETE',
-      headers: this._headers,
-    })
-      .then(this._checkResponse);
-  }
+  return res.text().then((text) => {
+    throw JSON.parse(text).message || JSON.parse(text).error;
+  });
 }
-
-const api = new Api({
-  baseUrl: `https://api.oksifoxy.movie.nomoredomains.xyz/`,
-  headers: {
-    authorization: `Bearer ${localStorage.getItem("jwt")}`,
-    'Content-Type': 'application/json'
-  }
-});
-
-export default api;

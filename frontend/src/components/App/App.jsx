@@ -1,11 +1,11 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { useState, } from 'react';
+import { Routes, Route, useNavigate, } from 'react-router-dom';
 import './App.css';
-import api from '../../utils/MainApi';
+import * as mainApi from "../../utils/MainApi";
+import { register, login, checkToken } from "../../utils/apiAuth"
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
-import { signUp, signIn, checkToken } from '../../utils/apiAuth';
 
 import Header from '../Header/Header';
 import Main from '../Main/Main';
@@ -18,130 +18,140 @@ import Login from '../Login/Login';
 import NotFound from '../NotFound/NotFound';
 
 function App() {
-  const [isLanding, setisLanding] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [isLoading, setLoading] = useState(false);
+  const [isServerResponse, setIsServerResponse] = useState(true);
   const [currentUser, setCurrentUser] = useState({});
-  const [movie, setMovie] = useState([]);
-  const [emailValue, setEmailValue] = useState(null);
-  const [popupStatus, setPopupStatus] = useState({ image:'', message:'' });
-  const [infoTooltip, setInfoTooltip] = useState(false);
+  const [userMovies, setUserMovies] = useState([]);
+  const [popupStatus, setPopupStatus] = useState({ message:'' });
   const navigate = useNavigate();
 
-  function handleRegister(name, email, password) {
-    signUp(name, email, password)
-      .then(() => {
+  function handleRegister({name, email, password}) {
+    register({name, email, password})
+    .then((res) => {
+      if (res._id) {
         console.log(popupStatus.message)
         setPopupStatus({ message: 'Вы успешно зарегистрировались!' });
-        handleInfoTooltip(true);
-        navigate("/signin");
-      })
-      .catch(() => {
+        handleLogin({email, password});
+      }
+    })
+    .catch(() => {
         setPopupStatus({ message: 'Что-то пошло не так! Попробуйте еще раз' });
       })
-      .finally(handleInfoTooltip);
+      .finally();
   };
 
-  function handleLogin(email, password) {
-    signIn(email, password)
+  function getUserMovies() {
+    mainApi.getUserMovies()
+      .then((res) => {
+        if (res.data) {
+          setUserMovies(res.data);
+          setIsServerResponse(true);
+        }
+      })
+      .catch((err) => {
+        setIsServerResponse(false);
+        console.log(`Ошибка: ${err}`);
+      });
+  }
+
+  function handleLogin({email, password}) {
+    login({email, password})
       .then((res) => {
         localStorage.setItem('jwt', res.token);
         setIsLoggedIn(true);
-        setEmailValue(email);
-        navigate("/");
+        getUserMovies();
+          navigate("/movies", { replace: true });
       })
       .catch(() => {
         setPopupStatus({ message: 'Что-то пошло не так! Попробуйте еще раз' });
-        handleInfoTooltip(true);
       });
   };
 
-  function handleLogOut() {
-    setIsLoggedIn(false);
-    localStorage.removeItem('jwt');
-    setEmailValue(null);
-    navigate("/signin");
-  };
+  function handleEditProfile(name, email) {
+    mainApi.editProfile(name, email)
+      .then((res) => {
+        if (res.data) {
+          setCurrentUser(res.data);
+          setPopupStatus({ message: 'Данные успешно обновлены' });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+  }
 
-  function handleInfoTooltip() {
-    setInfoTooltip(true);
-  };
+  function handleLogoutUser() {
+    mainApi.logoutUser()
+      .then((res) => {
+        if (res.message) {
+          setIsLoggedIn(false);
+          localStorage.removeItem('jwt');
+          console.log(res.message);
+          localStorage.removeItem("user");
+          localStorage.removeItem("request");
+          localStorage.removeItem("shorts");
+          localStorage.removeItem("movies");
+          navigate("/", { replace: true });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
 
-  useEffect(() => {
+  function handleSaveMovie(movie) {
+    mainApi.saveMovies(movie)
+      .then((res) => {
+        if (res.data) {
+          setUserMovies([res.data, ...userMovies]);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  function handleFilter(arr, request) {
+    const result = arr.filter((movie) => {
+      return (
+        movie.nameRU.toLowerCase().includes(request.toLowerCase()) ||
+        movie.nameEN.toLowerCase().includes(request.toLowerCase())
+      );
+    });
+    return result;
+  }
+
+function handleDeleteMovie(movieId) {
+    mainApi.deleteSavedMovie(movieId)
+      .then((res) => {
+        if (res.data) {
+          setUserMovies((movies) => movies.filter((m) => m._id !== res.data._id)
+          );
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  React.useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
       checkToken(jwt)
         .then((res) => {
           if (res) {
             setIsLoggedIn(true);
-            setEmailValue(res.data.email);
-            navigate('/');
+            setCurrentUser(res.data);
           }
         })
         .catch((err) => {
-        console.error(err);
+          setIsLoggedIn(false);
+          localStorage.removeItem("jwt");
         });
+    } else {
+      setIsLoggedIn(false);
     }
   }, []);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      Promise.all([api.getUserInfo(), api.getInitialMovies()])
-        .then(([profileInfo, movie]) => {
-          setCurrentUser(profileInfo);
-          setMovie(movie);
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-    }
-  }, [isLoggedIn])
-
-  function handleMovieClick(movie) {
-    setSelectedMovie(movie);
-  }
-
-  function handleMovieLike(movie) {
-    const isLiked = movie.likes.some((i) => i._id === currentUser._id);
-
-    if (!isLiked) {
-      api.addMovieLike(movie._id).then((newMovie) => {
-        setMovie((state) => state.map((m) => (m._id === movie._id ? newMovie : m)));
-      }).catch((err) => {
-        console.error(err);
-      });
-    } else {
-      api.deleteMovieLike(movie._id).then((newMovie) => {
-        setMovie((state) => state.map((m) => (m._id === movie._id ? newMovie : m)));
-      }).catch((err) => {
-        console.error(err);
-      });
-    }
-  }
-  function handleUpdateUser(data) {
-    setLoading(true);
-    api.setUserInfo(data)
-      .then((newUser) => {
-        setCurrentUser(newUser);
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        setLoading(false)
-      });
-  }
-
-  function handleMovieDelete (movie) {
-    api.deleteMovie(movie._id)
-      .then(() => {
-        setMovie((items) => items.filter((m) => m._id !== movie._id && m));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -150,14 +160,12 @@ function App() {
         <Route path="/" element={
           <>
             <Header 
-            isLanding={isLanding} 
+            loggedIn={isLoggedIn}
             />
             <Main
             loggedIn={isLoggedIn}
-
             />
             <Footer 
-
             />
           </>
         }
@@ -166,13 +174,15 @@ function App() {
             element={
               <>
                 <Header
-                  isLanding={!isLanding}
-                  // loggedIn={isLoggedIn}
-                  logOut={handleLogOut}
+                  loggedIn={!isLoggedIn}
                 />
                 <ProtectedRoute
                   component={Movies}
-                  // loggedIn={isLoggedIn}
+                  loggedIn={isLoggedIn}
+                  onSaveMovie={handleSaveMovie}
+                  onDeleteMovie={handleDeleteMovie}
+                  onFilter={handleFilter}
+                  userMovies={userMovies}
                 />
                 <Footer />
               </>
@@ -182,13 +192,15 @@ function App() {
             element={
               <>
                 <Header
-                  isLanding={!isLanding}
                   loggedIn={isLoggedIn}
                 />
                 <ProtectedRoute
                   component={SavedMovies}
                   loggedIn={isLoggedIn}
-                  element={SavedMovies}
+                  userMovies={userMovies}
+                  onServerResponse={isServerResponse}
+                  onDeleteMovie={handleDeleteMovie}
+                  onFilter={handleFilter}
                 />
                 <Footer />
               </>
@@ -198,14 +210,13 @@ function App() {
             element={
               <>
                 <Header
-                  isLanding={!isLanding}
                   loggedIn={isLoggedIn}
                 />
                 <ProtectedRoute
                   component={Profile}
                   loggedIn={isLoggedIn}
-                  onSubmit={handleUpdateUser}
-                  onLogout={handleLogOut}
+                  onSubmit={handleEditProfile}
+                  onLogout={handleLogoutUser}
                 />
               </>
             }
@@ -220,8 +231,7 @@ function App() {
         <Route path="/signin" 
           element={
             <Login
-            onLogin={handleLogin}
-            onRegister={handleRegister}
+            onSubmit={handleLogin}
             />
           }
         />

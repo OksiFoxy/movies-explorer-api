@@ -1,4 +1,5 @@
 require('dotenv').config();
+/* eslint-disable import/no-unresolved */
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
@@ -13,7 +14,6 @@ const { PORT = 3000 } = process.env;
 const app = express();
 app.use(cors);
 // AntiDOS & helmet
-// https://www.npmjs.com/package/express-rate-limit
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 минут
   max: 100, // Лимитировать каждый IP до 100 запросов на `окно` (здесь, за 15 минут)
@@ -34,5 +34,5 @@ app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Приложение слушает порт ${PORT}`);
+  console.log(`Приложение слушает порт ${PORT} `);
 });

@@ -3,7 +3,7 @@ import "./Navigation.css";
 import { Link } from "react-router-dom";
 import PopupMenu from "../MobMenu/MobMenu";
 
-function Navigation({ isLanding }) {
+function Navigation({ isLoggedIn }) {
   const [isMenuClicked, setIsMenuClicked] = React.useState(false);
 
   function handleMenuClick() {
@@ -11,7 +11,7 @@ function Navigation({ isLanding }) {
   }
 
   function navBar() {
-    if (!isLanding) {
+    if (!isLoggedIn) {
       return (
         <nav className="navigation">
           <Link

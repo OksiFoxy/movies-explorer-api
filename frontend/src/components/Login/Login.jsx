@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import "./Login.css";
 
-export default function Login({ onLogin }) {
+export default function Login({ onSubmit }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
@@ -14,9 +14,9 @@ export default function Login({ onLogin }) {
     setEmail(event.target.value);
   };
 
-  const handleSubmit = event => {
+  const handleLogin = event => {
     event.preventDefault();
-    onLogin(email, password);
+    onSubmit(email, password);
   };
 
   return (
@@ -26,7 +26,7 @@ export default function Login({ onLogin }) {
           <div className="auth__logo"></div>
         </Link>
         <h3 className="auth__title">Рады видеть!</h3>
-        <form className="auth__form" onSubmit={handleSubmit}>
+        <form className="auth__form" onSubmit={handleLogin}>
           <label className="auth__input-label">
             E-mail
           </label>
@@ -35,6 +35,7 @@ export default function Login({ onLogin }) {
             type="email"
             placeholder="Введите e-mail"
             onChange={handleEmailInput}
+            autoComplete="on"
             required>
           </input>
           <span className="auth__error"></span>
@@ -46,7 +47,8 @@ export default function Login({ onLogin }) {
             type="password"
             placeholder="Введите пароль"
             onChange={handlePasswordInput}
-            required>
+            required
+            autoComplete="off">
           </input>
           <span className="auth__error"></span>
           <button className="auth__submit">Войти</button>

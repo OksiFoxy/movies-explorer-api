@@ -5,11 +5,11 @@ const checkResponse = (res) => {
   return Promise.reject(res.status);
 }
 
-const BASE_URL = 'https://api.oksifoxy.movie.nomoredomains.xyz/';
+const BASE_URL ='http://api.oksifoxy.movie.nomoredomains.xyz';
 
-const signUp = (email, password) => {
+const register = (email, password, name) => {
   const requestUrl = BASE_URL + '/signup';
-  return fetch (requestUrl, {
+  return fetch(requestUrl, {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -17,9 +17,9 @@ const signUp = (email, password) => {
     .then(checkResponse);
 }
 
-const signIn = (email, password) => {
+const login = (email, password) => {
   const requestUrl = BASE_URL + '/signin';
-  return fetch (requestUrl, {
+  return fetch(requestUrl, {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -27,17 +27,16 @@ const signIn = (email, password) => {
     .then(checkResponse);
 }
 
-const checkToken = (token) => {
+const checkToken = () => {
   const requestUrl = BASE_URL + '/users/me';
   return fetch(requestUrl, {
     method: 'GET',
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+      "Authorization": `Bearer ${localStorage.getItem("jwt")}`
     },
   })
     .then(checkResponse);
 }
 
-
-export { signUp, signIn, checkToken };
+export { register, login, checkToken };
