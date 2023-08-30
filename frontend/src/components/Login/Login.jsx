@@ -35,7 +35,6 @@ export default function Login({ onSubmit }) {
             type="email"
             placeholder="Введите e-mail"
             onChange={handleEmailInput}
-            autoComplete="on"
             required>
           </input>
           <span className="auth__error"></span>

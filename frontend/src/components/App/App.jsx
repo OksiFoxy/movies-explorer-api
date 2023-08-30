@@ -31,7 +31,6 @@ function App() {
       if (res._id) {
         console.log(popupStatus.message)
         setPopupStatus({ message: 'Вы успешно зарегистрировались!' });
-        handleLogin({email, password});
       }
     })
     .catch(() => {
@@ -57,7 +56,7 @@ function App() {
   function handleLogin({email, password}) {
     login({email, password})
       .then((res) => {
-        localStorage.setItem('jwt', res.token);
+        localStorage.setItem('jwt');
         setIsLoggedIn(true);
         getUserMovies();
           navigate("/movies", { replace: true });
@@ -141,12 +140,15 @@ function handleDeleteMovie(movieId) {
         .then((res) => {
           if (res) {
             setIsLoggedIn(true);
-            setCurrentUser(res.data);
+            setCurrentUser(res);
+            navigate('/movies');
+            handleLogin();
+            handleEditProfile();
           }
         })
         .catch((err) => {
           setIsLoggedIn(false);
-          localStorage.removeItem("jwt");
+          navigate('/');
         });
     } else {
       setIsLoggedIn(false);

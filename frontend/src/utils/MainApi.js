@@ -1,5 +1,5 @@
 // import {BASE_URL} from './constants';
-const BASE_URL ='http://api.oksifoxy.movie.nomoredomains.xyz';
+const BASE_URL ='api.oksifoxy.movie.nomoredomains.xyz';
 
 export const editProfile = ({name, email}) => {
   const requestUrl = BASE_URL + '/users/me';
@@ -44,7 +44,7 @@ export const getUserMovies = () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("jwt")}`
+      // "Authorization": `Bearer ${localStorage.getItem("jwt")}`,
     },
   }).then((res) => checkResponse(res));
 };

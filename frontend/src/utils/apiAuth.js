@@ -5,7 +5,7 @@ const checkResponse = (res) => {
   return Promise.reject(res.status);
 }
 
-const BASE_URL ='http://api.oksifoxy.movie.nomoredomains.xyz';
+const BASE_URL = 'api.oksifoxy.movie.nomoredomains.xyz';
 
 const register = (email, password, name) => {
   const requestUrl = BASE_URL + '/signup';

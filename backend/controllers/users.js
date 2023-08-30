@@ -22,6 +22,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректные данные пользователя'));
       } else {
+        console.log('консоль лог получение');
         next(err);
       }
     });
@@ -41,6 +42,7 @@ module.exports.updateUserData = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректные данные пользователя'));
       } else {
+        console.log('консоль лог апдейт юзер');
         next(err);
       }
     });
@@ -58,6 +60,7 @@ module.exports.login = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректные данные пользователя'));
       } else {
+        console.log('консоль лог логин');
         next(err);
       }
     });
@@ -79,6 +82,7 @@ module.exports.createUser = (req, res, next) => {
       } else if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
       } else {
+        console.log('консоль лог регистрация');
         next(err);
       }
     });
