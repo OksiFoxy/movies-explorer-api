@@ -1,5 +1,4 @@
 const BASE_URL = 'http://api.oksifoxy.movie.nomoredomains.xyz';
-// const BASE_URL = 'http://localhost:3000';
 
 const regEmail =
   /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;

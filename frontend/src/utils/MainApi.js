@@ -1,5 +1,4 @@
-// import {BASE_URL} from './constants';
-const BASE_URL ='api.oksifoxy.movie.nomoredomains.xyz';
+import {BASE_URL} from './constants';
 
 export const editProfile = ({name, email}) => {
   const requestUrl = BASE_URL + '/users/me';
@@ -34,12 +33,12 @@ export const saveMovies = (movie) => {
       nameEN: movie.nameEN,
       thumbnail: `https://api.nomoreparties.co${movie.image.formats.thumbnail.url}`,
       movieId: movie.id,
-    }),
+    })
   }).then((res) => checkResponse(res));
 };
 
 export const getUserMovies = () => {
-  const requestUrl = BASE_URL + '/movies/';
+  const requestUrl = BASE_URL + '/movies';
   return fetch(requestUrl, {
     method: "GET",
     headers: {
